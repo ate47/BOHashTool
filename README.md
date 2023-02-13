@@ -2,7 +2,7 @@
 
 Tool to try hashes in a directory of GSC files, I made it like that, you can use something else if you want.
 
-For a Java implementation of the hashing methods, the [fr.atesab.bo4hash.Hash](src/main/java/fr/atesab/bo4hash/Hash.java) is here
+For a Java implementation of the hashing methods, the [fr.atesab.bo4hash.utils.HashUtils](src/main/java/fr/atesab/bo4hash/utils/HashUtils.java) is here
 
 I use it to explore this fork repository: https://github.com/ate47/t8-src
 
@@ -28,3 +28,9 @@ It can be used to search for multiple objects at once
 Or path
 
 ![example 3](docs/example_3.png)
+
+You can use it to search over multiple fields at the same time
+
+![example 4](docs/example_4.png)
+
+![example 5](docs/example_5.png)

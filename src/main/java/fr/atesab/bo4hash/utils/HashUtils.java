@@ -1,6 +1,6 @@
-package fr.atesab.bo4hash;
+package fr.atesab.bo4hash.utils;
 
-public class Hash {
+public class HashUtils {
 
     private static final long SCRIPT_NAMESPACE = 0x30FCC2BF;
     private static final long NUM_START = Long.parseUnsignedLong("cbf29ce484222325", 16);
