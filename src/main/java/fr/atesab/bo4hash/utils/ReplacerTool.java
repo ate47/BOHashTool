@@ -94,8 +94,8 @@ public class ReplacerTool {
                         return null;
                     }
 
-                    String value = line.substring(0, idx);
-                    String hash = line.substring(idx + 1);
+                    String hash = line.substring(0, idx);
+                    String value = line.substring(idx + 1);
 
                     if (hash.startsWith("script_")) {
                         value = value.replace('/', '\\');

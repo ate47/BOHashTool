@@ -7,11 +7,11 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ExpandTool {
-    private static final String[] EXPAND = {"/", "\\", "_", ""};
+    private static final String[] EXPAND = {"/", "\\", "_", "", " "};
     public static Stream<String> expand(Stream<String> stream) {
         return stream
                 .flatMap(key -> {
-                    String[] words = Stream.of(key.split("[\\\\/_]")).filter(s -> !s.isEmpty()).toArray(String[]::new);
+                    String[] words = Stream.of(key.split("[\\\\/_ ]")).filter(s -> !s.isEmpty()).toArray(String[]::new);
                     if (words.length <= 1 || words.length > 3) {
                         // too big
                         return Stream.of(key);
@@ -55,6 +55,33 @@ public class ExpandTool {
 
                                 return result.stream();
                             }));
+                })
+                .map(obj -> obj.replace('\\', '/'))
+                .flatMap(obj -> {
+                    if (obj.length() <= 4 || obj.charAt(obj.length() - 4) != '.') {
+                        return Stream.of(obj);
+                    }
+
+                    String s = obj.substring(0, obj.length() - 4);
+                    if (obj.endsWith("gsc")) {
+                        int pathLast = obj.lastIndexOf('/');
+                        if (pathLast != -1) {
+                            String namespace = obj.substring(pathLast + 1);
+                            return Stream.of(namespace, obj, s + ".csc");
+                        } else {
+                            return Stream.of(obj, s + ".csc");
+                        }
+                    }
+                    if (obj.endsWith("csc")) {
+                        int pathLast = obj.lastIndexOf('/');
+                        if (pathLast != -1) {
+                            String namespace = obj.substring(pathLast + 1);
+                            return Stream.of(namespace, obj, s + ".gsc");
+                        } else {
+                            return Stream.of(obj, s + ".gsc");
+                        }
+                    }
+                    return Stream.of(obj);
                 })
                 // reduce size
                 .flatMap(obj -> {
