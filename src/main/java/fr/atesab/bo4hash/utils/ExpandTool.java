@@ -7,90 +7,119 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ExpandTool {
-    private static final String[] EXPAND = {"/", "\\", "_", "", " "};
-    public static Stream<String> expand(Stream<String> stream) {
-        return stream
-                .flatMap(key -> {
-                    String[] words = Stream.of(key.split("[\\\\/_ ]")).filter(s -> !s.isEmpty()).toArray(String[]::new);
-                    if (words.length <= 1 || words.length > 3) {
-                        // too big
-                        return Stream.of(key);
-                    }
+	private static final String[] EXPAND = {"/", "\\", "_", "", " "};
 
-                    Stream<List<String>> out = Stream.of(words).map(List::of);
+	public static Stream<String> expand(String configStr) {
+		int prefixIndex = configStr.indexOf('|');
+		int suffixIndex = configStr.lastIndexOf('|');
+		String prefix;
+		String cfg;
+		String suffix;
+		if (prefixIndex == suffixIndex) {
+			suffix = "";
+			if (prefixIndex == -1) {
+				prefix = "";
+				cfg = configStr;
+			} else {
+				prefix = configStr.substring(0, prefixIndex);
+				cfg = configStr.substring(prefixIndex + 1);
+			}
+		} else {
+			prefix = configStr.substring(0, prefixIndex);
+			suffix = configStr.substring(suffixIndex + 1);
+			cfg = configStr.substring(prefixIndex + 1, suffixIndex);
+		}
+		Stream<String> expand = expand(Stream.of(cfg));
+		if (prefix.isEmpty() && suffix.isEmpty()) {
+			return expand;
+		} else {
+			return expand.map(s -> prefix + s + suffix);
+		}
+	}
 
-                    for (int i = 1; i < words.length; i++) {
-                        out = out.flatMap(k -> Stream.of(words).flatMap(word -> IntStream.range(0, k.size() + 1)
-                                .mapToObj(id -> {
-                                    List<String> lst = new ArrayList<>(k.size() + 1);
+	public static Stream<String> expand(Stream<String> stream) {
+		return stream
+				.flatMap(key -> {
+					String[] words = Stream.of(key.split("[\\\\/_ ]")).filter(s -> !s.isEmpty()).toArray(String[]::new);
+					if (words.length <= 1 || words.length > 3) {
+						// too big
+						return Stream.of(key);
+					}
 
-                                    lst.addAll(k.subList(0, id));
-                                    lst.add(word);
-                                    lst.addAll(k.subList(id, k.size()));
+					Stream<List<String>> out = Stream.of(words).map(List::of);
 
-                                    return lst;
-                                })));
-                    }
+					for (int i = 1; i < words.length; i++) {
+						out = out.flatMap(k -> Stream.of(words).flatMap(word -> IntStream.range(0, k.size() + 1)
+								.mapToObj(id -> {
+									List<String> lst = new ArrayList<>(k.size() + 1);
 
-                    return Stream.concat(Stream.of(key), out
-                            .flatMap(k -> {
-                                if (k.isEmpty()) {
-                                    return Stream.empty();
-                                }
-                                List<String> result = new ArrayList<>();
+									lst.addAll(k.subList(0, id));
+									lst.add(word);
+									lst.addAll(k.subList(id, k.size()));
 
-                                result.add(k.get(0));
+									return lst;
+								})));
+					}
 
-                                for (int i = 1; i < k.size(); i++) {
-                                    ListIterator<String> it = result.listIterator();
-                                    while (it.hasNext()) {
-                                        String e = it.next();
-                                        String nextElement = k.get(i);
-                                        it.remove();
-                                        for (String s : EXPAND) {
-                                            it.add(e + s + nextElement);
-                                        }
-                                    }
-                                }
+					return Stream.concat(Stream.of(key), out
+							.flatMap(k -> {
+								if (k.isEmpty()) {
+									return Stream.empty();
+								}
+								List<String> result = new ArrayList<>();
 
-                                return result.stream();
-                            }));
-                })
-                .map(obj -> obj.replace('\\', '/'))
-                .flatMap(obj -> {
-                    if (obj.length() <= 4 || obj.charAt(obj.length() - 4) != '.') {
-                        return Stream.of(obj);
-                    }
+								result.add(k.get(0));
 
-                    String s = obj.substring(0, obj.length() - 4);
-                    if (obj.endsWith("gsc")) {
-                        int pathLast = obj.lastIndexOf('/');
-                        if (pathLast != -1) {
-                            String namespace = obj.substring(pathLast + 1);
-                            return Stream.of(namespace, obj, s + ".csc");
-                        } else {
-                            return Stream.of(obj, s + ".csc");
-                        }
-                    }
-                    if (obj.endsWith("csc")) {
-                        int pathLast = obj.lastIndexOf('/');
-                        if (pathLast != -1) {
-                            String namespace = obj.substring(pathLast + 1);
-                            return Stream.of(namespace, obj, s + ".gsc");
-                        } else {
-                            return Stream.of(obj, s + ".gsc");
-                        }
-                    }
-                    return Stream.of(obj);
-                })
-                // reduce size
-                .flatMap(obj -> {
-                    if (obj.length() < 20) {
-                        return IntStream.range(1, obj.length() + 1)
-                                .mapToObj(l -> obj.substring(0, l));
-                    } else {
-                        return Stream.of(obj);
-                    }
-                });
-    }
+								for (int i = 1; i < k.size(); i++) {
+									ListIterator<String> it = result.listIterator();
+									while (it.hasNext()) {
+										String e = it.next();
+										String nextElement = k.get(i);
+										it.remove();
+										for (String s : EXPAND) {
+											it.add(e + s + nextElement);
+										}
+									}
+								}
+
+								return result.stream();
+							}));
+				})
+				.map(obj -> obj.replace('\\', '/'))
+				.flatMap(obj -> {
+					if (obj.length() <= 4 || obj.charAt(obj.length() - 4) != '.') {
+						return Stream.of(obj);
+					}
+
+					String s = obj.substring(0, obj.length() - 4);
+					if (obj.endsWith("gsc")) {
+						int pathLast = obj.lastIndexOf('/');
+						if (pathLast != -1) {
+							String namespace = obj.substring(pathLast + 1);
+							return Stream.of(namespace, obj, s + ".csc");
+						} else {
+							return Stream.of(obj, s + ".csc");
+						}
+					}
+					if (obj.endsWith("csc")) {
+						int pathLast = obj.lastIndexOf('/');
+						if (pathLast != -1) {
+							String namespace = obj.substring(pathLast + 1);
+							return Stream.of(namespace, obj, s + ".gsc");
+						} else {
+							return Stream.of(obj, s + ".gsc");
+						}
+					}
+					return Stream.of(obj);
+				})
+				// reduce size
+				.flatMap(obj -> {
+					if (obj.length() < 20) {
+						return IntStream.range(1, obj.length() + 1)
+								.mapToObj(l -> obj.substring(0, l));
+					} else {
+						return Stream.of(obj);
+					}
+				});
+	}
 }

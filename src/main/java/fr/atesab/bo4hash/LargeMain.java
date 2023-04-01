@@ -18,7 +18,7 @@ public class LargeMain {
         try (BufferedWriter w = Files.newBufferedWriter(Path.of("brute.txt"), StandardOpenOption.APPEND)) {
             //scripts/wz_common/gametypes
             // String dict = "abcdefghijklmnopqrstuvwxyz0123456789_";
-            String dict = "abcdefghijklmnopqrstuvwxyz_";
+            String dict = "abcdefghijklmnopqrstuvwxyz_/";
             //String dict = "0123456789abcdef";
             // mp 260000000
             // boss_ 820000000
@@ -27,13 +27,13 @@ public class LargeMain {
             // character_ 2690000000
             // scripts/??/mp/??.gsc 255440000000
             String[] prefixes = {
-                    "scripts/core_common/vehicles/"
+                    "scripts/"
             };
 
             String[] mid = {
             };
 
-            searcher.bruteForceAsync(prefixes, mid, ".gsc", 10, dict, 0).forEach(next -> {
+            searcher.bruteForceAsync(prefixes, mid, "/elemtext.gsc", 10, dict, 0).forEach(next -> {
                         System.out.println(next.hash().element() + "," + next.key());
                         try {
                             w.append(next.hash().element()).append(",").append(next.key()).append("\n").flush();

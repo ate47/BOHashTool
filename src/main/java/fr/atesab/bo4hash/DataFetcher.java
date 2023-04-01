@@ -103,7 +103,7 @@ public class DataFetcher {
 		}
 		try (BufferedWriter writer = Files.newBufferedWriter(objects.resolve("scripts.txt"))) {
 			for (String script : scripts) {
-				writer.append(Long.toString(HashUtils.hashRes(script), 16)).append(",").append(script).write("\n");
+				writer.append(Long.toString(HashUtils.hashFNV(script), 16)).append(",").append(script).write("\n");
 			}
 		}
 	}

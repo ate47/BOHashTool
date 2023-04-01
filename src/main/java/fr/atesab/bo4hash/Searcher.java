@@ -210,7 +210,7 @@ public class Searcher {
                     }
                     Matcher hashMatch = hashPattern.matcher(s);
                     while (hashMatch.find()) {
-                        Obj obj = new Obj(hashMatch.group(2).toLowerCase().substring(1), hashMatch.group());
+                        Obj obj = new Obj(hashMatch.group(2).toLowerCase(), hashMatch.group());
                         if (obj.hash().isEmpty()) {
                             continue;
                         }

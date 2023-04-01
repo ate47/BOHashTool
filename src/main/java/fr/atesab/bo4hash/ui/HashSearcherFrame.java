@@ -203,7 +203,7 @@ public class HashSearcherFrame extends JFrame {
                 hashString.setText(hashStringValue);
                 hashObject.setText(hashObjectValue);
                 String output = String.join("\n", ExpandTool
-                        .expand(Stream.of(textContent))
+                        .expand(textContent)
                         .flatMap(k -> HashSearcherFrame.this.searcher.search(k).stream().map(o -> o.element() + "," + k))
                         .parallel()
                         .collect(Collectors.toSet()));
