@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
 public class LargeMain {
@@ -14,11 +15,11 @@ public class LargeMain {
         System.out.println(pathCfg);
         System.out.println(searcher.load(pathCfg));
         // 1570000001
-        try (BufferedWriter w = Files.newBufferedWriter(Path.of("brute.txt"))) {
+        try (BufferedWriter w = Files.newBufferedWriter(Path.of("brute.txt"), StandardOpenOption.APPEND)) {
             //scripts/wz_common/gametypes
             String dict = "abcdefghijklmnopqrstuvwxyz_";
             long n = dict.length();
-            searcher.bruteForceAsync("scripts/zm_common/", "/zm_powerup_nuke.gsc", 10, dict, n)
+            searcher.bruteForceAsync("zm_trial_office_", "", 10, dict, 0)
                     .forEach(next -> {
                         System.out.println(next.key() + "," + next.hash().element());
                         try {
