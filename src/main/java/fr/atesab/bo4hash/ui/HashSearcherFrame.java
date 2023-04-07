@@ -28,9 +28,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,6 +43,8 @@ public class HashSearcherFrame extends JFrame {
     public static final Image TAB_REPLACE;
     public static final Image TAB_BRUTE;
     public static final Image TAB_LANG;
+    public static final Image TAB_DB;
+    public static final Image TAB_CONVERT;
 
     static {
         try {
@@ -51,6 +55,8 @@ public class HashSearcherFrame extends JFrame {
             TAB_LANG = atlas.getSubimage(128 + 32 * 2, 0, 32, 32);
             TAB_REPLACE = atlas.getSubimage(128 + 32 * 3, 0, 32, 32);
             TAB_BRUTE = atlas.getSubimage(128, 32, 32, 32);
+            TAB_DB = atlas.getSubimage(128 + 32, 32, 32, 32);
+            TAB_CONVERT = atlas.getSubimage(128 + 32 * 2, 32, 32, 32);
         } catch (Throwable t) {
             throw new Error(t);
         }
@@ -76,6 +82,8 @@ public class HashSearcherFrame extends JFrame {
         createLargeSearchTab(tabbedPane, width - 20, height - 40);
         createTabReplace(tabbedPane, width - 20, height - 40);
         // createBruteTab(tabbedPane, width - 20, height - 40);
+        // createDbTab(tabbedPane, width - 20, height - 40);
+        createLargeHashTab(tabbedPane, width - 20, height - 40);
 
 
         tabbedPane.setBackground(Color.WHITE);
@@ -190,13 +198,13 @@ public class HashSearcherFrame extends JFrame {
         text.getDocument().addDocumentListener(new DocumentListener() {
             private void loadText() {
                 String textContent = text.getText();
-                String hashStringValue = Long.toUnsignedString(HashUtils.hashRes(textContent), 16).toLowerCase();
-                String hashObjectValue = Long.toUnsignedString(HashUtils.hashComp(textContent), 16).toLowerCase();
+                String hashStringValue = Long.toUnsignedString(HashUtils.hashFNV(textContent), 16).toLowerCase();
+                String hashObjectValue = Long.toUnsignedString(HashUtils.hashIDF(textContent), 16).toLowerCase();
                 hashString.setText(hashStringValue);
                 hashObject.setText(hashObjectValue);
                 String output = String.join("\n", ExpandTool
                         .expand(Stream.of(textContent))
-                        .flatMap(k -> HashSearcherFrame.this.searcher.search(k).stream().map(o -> k + "," + o.element()))
+                        .flatMap(k -> HashSearcherFrame.this.searcher.search(k).stream().map(o -> o.element() + "," + k))
                         .parallel()
                         .collect(Collectors.toSet()));
                 notificationField.setText(output.isEmpty() ? "no find" : output);
@@ -267,6 +275,7 @@ public class HashSearcherFrame extends JFrame {
 
         JTextArea hashes = new JTextArea("");
         JScrollPane scrollHashes = new JScrollPane(hashes, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
         JTextArea find = new JTextArea("");
         find.setEditable(false);
         JScrollPane scrollFind = new JScrollPane(find, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -280,9 +289,9 @@ public class HashSearcherFrame extends JFrame {
             private void loadText() {
                 String textContent = hashes.getText();
                 String output = String.join("\n", Arrays.stream(textContent.split("\n"))
-                        .flatMap(k -> searcher.search(k).stream().map(o -> k + "," + o.element()))
+                        .flatMap(k -> searcher.search(k).stream().map(o -> o.element() + "," + k))
                         .parallel()
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toCollection(TreeSet::new)));
                 find.setText(output.isEmpty() ? "no find" : output);
             }
 
@@ -311,6 +320,73 @@ public class HashSearcherFrame extends JFrame {
 
         panel.add(scrollHashes);
         panel.add(scrollFind);
+        panel.add(copyFind);
+    }
+
+    private void createLargeHashTab(JTabbedPane pane, int width, int height) {
+        JPanel panel = new JPanel(null);
+
+        pane.addTab("Large hash", panel);
+        pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_CONVERT));
+        panel.setBackground(Color.WHITE);
+
+        JTextArea hashes = new JTextArea("");
+        JScrollPane scrollHashes = new JScrollPane(hashes, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        JTextArea hashesConverted = new JTextArea("");
+        hashesConverted.setEditable(false);
+        JScrollPane scrollHashesConverted = new JScrollPane(hashesConverted, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        int size = (height - 90) / 2;
+        scrollHashes.setBounds(15, 4, width - 35, size);
+        scrollHashesConverted.setBounds(15, 4 + size + 4, width - 35, size);
+
+
+        hashes.getDocument().addDocumentListener(new DocumentListener() {
+            private void loadText() {
+                String textContent = hashes.getText();
+                String output = String.join("\n",
+                        Arrays.stream(textContent.split("\n"))
+                                .filter(l -> !l.isBlank())
+                                .map(l -> {
+                                    l = l.replace('\\', '/');
+                                    if (l.startsWith("scripts/")) {
+                                        return "script_" + Long.toUnsignedString(HashUtils.hashFNV(l), 16) + "," + l;
+                                    } else {
+                                        return "hash_" + Long.toUnsignedString(HashUtils.hashFNV(l), 16) + "," + l;
+                                    }
+                                })
+                                .parallel()
+                                .collect(Collectors.toCollection(TreeSet::new))
+                );
+                hashesConverted.setText(output);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                loadText();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                loadText();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                loadText();
+            }
+        });
+
+        JButton copyFind = new JButton("Copy");
+        copyFind.setBounds(20, height - 70, width - 40, 20);
+        copyFind.setBackground(Color.WHITE);
+        copyFind.setForeground(Color.BLACK);
+        copyFind.setBorder(new LineBorder(Color.LIGHT_GRAY));
+        copyFind.addActionListener(l -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(hashesConverted.getText()), null));
+
+        panel.add(scrollHashes);
+        panel.add(scrollHashesConverted);
         panel.add(copyFind);
     }
 
@@ -346,12 +422,33 @@ public class HashSearcherFrame extends JFrame {
         panel.add(scrollHashes);
         panel.add(copyFind);
     }
+
     private void createBruteTab(JTabbedPane pane, int width, int height) {
         JPanel panel = new JPanel(null);
 
         pane.addTab("Brute", panel);
         pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_BRUTE));
         panel.setBackground(Color.WHITE);
+
+
+    }
+
+    private void createDbTab(JTabbedPane pane, int width, int height) {
+        JPanel panel = new JPanel(null);
+
+        pane.addTab("DB", panel);
+        pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_DB));
+        panel.setBackground(Color.WHITE);
+
+
+        JButton saveDB = new JButton("Save DB");
+        saveDB.setBounds(width / 2 - 200, 4, 400, 20);
+        saveDB.setBackground(Color.WHITE);
+        saveDB.setForeground(Color.BLACK);
+        saveDB.setBorder(new LineBorder(Color.LIGHT_GRAY));
+        saveDB.addActionListener(l -> searcher.saveDb(Path.of("null")));
+
+        panel.add(saveDB);
 
 
     }
