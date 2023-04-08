@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'fr.atesab'
-version '1.3.0'
+version '1.4.0'
 
 repositories {
     mavenCentral()
@@ -12,9 +12,16 @@ repositories {
 
 jar {
     manifest {
-        attributes(
-                'Main-Class': application.mainClass
-        )
+        attributes([
+                'Main-Class': application.mainClass,
+                "Specification-Title": "BOHashTool",
+                "Specification-Vendor": "ATE47",
+                "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": "BOHashTool",
+                "Implementation-Version": "${project.version}",
+                "Implementation-Vendor" :"ATE47",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }
 

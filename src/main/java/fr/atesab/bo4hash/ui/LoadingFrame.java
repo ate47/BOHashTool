@@ -44,6 +44,8 @@ public class LoadingFrame extends JFrame implements Searcher.IndexListener {
         panel.add(area);
         setContentPane(panel);
         setResizable(false);
+        panel.setBackground(Color.WHITE);
+        setBackground(Color.WHITE);
         setSize(400, 200);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

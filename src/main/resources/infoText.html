@@ -1,0 +1,86 @@
+<html>
+<head>
+    <style>
+    a {
+        color: #005599;
+        text-decoration: none;
+    }
+
+    body {
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+<h2>{{project.name}} {{project.version}}</h2>
+<a href="{{project.url}}">Github</a>
+<br>
+<br>
+<p><strong>Author(s)</strong></p>
+<p>{{authors}}</p>
+<br>
+<p><strong>License</strong></p>
+<p>{{license}}</p>
+<br>
+<hr>
+<h2>Loading status</h2>
+<p>{{loader.info}}</p>
+<br>
+<hr>
+<h2>Tools</h2>
+<h3><a href="bohashtool:set-page search">Search</a></h3>
+<p>
+    The search tool allows you to search for a particular hash, it will try to search for permutation of you string.
+</p>
+<p>
+    You can set a prefix using the '|' keyword, it won't do any permutation the element before it.
+    If you add a second one it will act a suffix and won't do any permutation after it. If you end your hash by ".gsc"
+    or by
+    ".csc", it will search for the hash with from the last '/' to the '.' and to the same hash with ".csc" or ".gsc" at
+    the end.
+</p>
+
+<br>
+<h3><a href="bohashtool:set-page large-search">Large search</a></h3>
+<p>
+    The large search tool allows you to search for multiple hashes at the same time, unlike Search, it won't do any
+    permutation
+</p>
+
+<br>
+<h3><a href="bohashtool:set-page large-hash">Large hash</a></h3>
+<p>
+    The large hash tool allows you to hash multiple elements at the same time with the FNV-1a method, it won't search
+    for the hash in your files.
+    It can be useful to create a list of hashes from components.
+</p>
+
+<br>
+<h3><a href="bohashtool:set-page replace">Replace</a></h3>
+<p>
+    The replace tool allows you to replace all the found elements in your directory, the syntax is the same as the one
+    returned by the Search tools.
+</p>
+<br>
+<h3><a href="bohashtool:set-page extract">Extractor</a></h3>
+<p>
+    The extractor tool allows you to extract all the elements in your directory, it will write it into an output directory.
+</p>
+<br>
+<hr>
+<h2>Repositories</h2>
+
+<p>Here a small list of repositories to find some hashed .gsc scripts.</p>
+
+<p><a href="https://github.com/shiversoftdev/t8-src">Serious' BO4 decompiled scripts</a> (<a
+        href="https://github.com/ate47/t8-src">My version</a>)</p>
+<p><a href="https://github.com/shiversoftdev/t9-src">Serious' BO Cold War decompiled scripts</a> (<a
+        href="https://github.com/ate47/t9-src">My version</a>)</p>
+
+<br>
+<hr>
+<h2>Hey your tool is ugly</h2>
+<a href="bohashtool:alert no u ugly, at least my tool is doing his job :p">Click here</a>, but you can do it yourself, the
+methods to hash are in the <a href="{{project.url}}/blob/master/src/main/java/fr/atesab/bo4hash/utils/HashUtils.java">HashUtils</a> class on Github.
+</body>
+</html>
