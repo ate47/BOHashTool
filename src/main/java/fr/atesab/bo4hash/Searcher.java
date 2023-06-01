@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -162,6 +163,7 @@ public class Searcher {
             Pattern hashPattern = Pattern.compile("(hash|script)_([0-9a-fA-F]+)");
             Pattern compPattern = Pattern.compile("(function|namespace|var|class)_([0-9a-fA-F]+)");
 
+            AtomicInteger count = new AtomicInteger(1);
             try (Stream<Path> list = Files.walk(dir)) {
                 list.parallel().forEach(p -> {
                     if (Files.isDirectory(p)) {
@@ -197,7 +199,7 @@ public class Searcher {
                     if (!(name.endsWith(".gsc") || name.endsWith(".csc"))) {
                         return;
                     }
-                    listener.notification("loading " + name);
+                    listener.notification("loading #" + count.getAndIncrement() + " - " + name);
                     if (name.startsWith("script_")) {
                         Obj obj = new Obj(name.substring("script_".length(), name.length() - 4).toLowerCase(), name.substring(0, name.length() - 4));
                         files.put(Long.parseUnsignedLong(obj.hash(), 16), obj);

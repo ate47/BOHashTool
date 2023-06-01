@@ -6,7 +6,6 @@ import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,6 +42,11 @@ public class InfoTabInfo {
     private static final String project = "BOHashTool";
     private static final String projectURL = "https://github.com/ate47/BOHashTool";
     private static final String license = "MIT License";
+
+    public static String getAuthors() {
+        return Arrays.stream(authors).map(s -> s[0]).collect(Collectors.joining("/"));
+    }
+
     private final JEditorPane jep;
     private final Component area;
     private final Map<String, String> dataMap = new HashMap<>();

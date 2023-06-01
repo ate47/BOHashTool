@@ -10,6 +10,7 @@ import fr.atesab.bo4hash.utils.ReplacerTool;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,6 +33,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -43,6 +45,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HashSearcherFrame extends JFrame {
     public static final Image ICON;
@@ -127,7 +130,7 @@ public class HashSearcherFrame extends JFrame {
     private final Map<String, Integer> TAB_INDEX = new HashMap<>();
 
     public HashSearcherFrame(Properties prop, Searcher searcher, String startText) {
-        super("COD Hash tool (" + getVersion() + ")");
+        super("COD Hash tool (" + getVersion() + " by "+ InfoTabInfo.getAuthors() +")");
         this.searcher = searcher;
         this.startText = startText;
         tabInfo.setLoadedInfo(startText == null ? "" : startText);
@@ -348,35 +351,45 @@ public class HashSearcherFrame extends JFrame {
         scrollHashes.setBounds(15, 4, width - 35, size);
         scrollFind.setBounds(15, 4 + size + 4, width - 35, size);
 
+        JCheckBox expand = new JCheckBox("Expand");
+        expand.setBounds(width - 100, height - 70, 100, 20);
+        expand.setBackground(Color.WHITE);
+
+        Runnable loadText = () -> {
+            String textContent = hashes.getText();
+            Stream<String> stream = Arrays.stream(textContent.split("\n"));
+            if (expand.isSelected()) {
+                stream = ExpandTool.expand(stream);
+            }
+            String output = String.join("\n", stream
+                    .flatMap(k -> searcher.search(k).stream().map(o -> o.element() + "," + k))
+                    .parallel()
+                    .collect(Collectors.toCollection(TreeSet::new)));
+            find.setText(output.isEmpty() ? "no find" : output);
+        };
 
         hashes.getDocument().addDocumentListener(new DocumentListener() {
-            private void loadText() {
-                String textContent = hashes.getText();
-                String output = String.join("\n", Arrays.stream(textContent.split("\n"))
-                        .flatMap(k -> searcher.search(k).stream().map(o -> o.element() + "," + k))
-                        .parallel()
-                        .collect(Collectors.toCollection(TreeSet::new)));
-                find.setText(output.isEmpty() ? "no find" : output);
-            }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
-                loadText();
+                loadText.run();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                loadText();
+                loadText.run();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                loadText();
+                loadText.run();
             }
         });
 
+        expand.addActionListener((e) -> loadText.run());
+
         JButton copyFind = new JButton("Copy");
-        copyFind.setBounds(20, height - 70, width - 40, 20);
+        copyFind.setBounds(20, height - 70, width - 140, 20);
         copyFind.setBackground(Color.WHITE);
         copyFind.setForeground(Color.BLACK);
         copyFind.setBorder(new LineBorder(Color.LIGHT_GRAY));
@@ -384,6 +397,7 @@ public class HashSearcherFrame extends JFrame {
 
         panel.add(scrollHashes);
         panel.add(scrollFind);
+        panel.add(expand);
         panel.add(copyFind);
         return pane.getTabCount();
     }
@@ -406,11 +420,31 @@ public class HashSearcherFrame extends JFrame {
         scrollHashes.setBounds(15, 4, width - 35, size);
         scrollHashesConverted.setBounds(15, 4 + size + 4, width - 35, size);
 
+        JCheckBox idf = new JCheckBox("Canon. ID");
+        idf.setBounds(width - 100, height - 70, 100, 20);
+        idf.setBackground(Color.WHITE);
 
-        hashes.getDocument().addDocumentListener(new DocumentListener() {
-            private void loadText() {
-                String textContent = hashes.getText();
-                String output = String.join("\n",
+        JCheckBox sort = new JCheckBox("Sort Result");
+        sort.setBounds(width - 200, height - 70, 100, 20);
+        sort.setBackground(Color.WHITE);
+
+
+        Runnable loadText = () -> {
+            String textContent = hashes.getText();
+            String output;
+
+            if (idf.isSelected()) {
+                output = String.join("\n",
+                        Arrays.stream(textContent.split("\n"))
+                                .filter(l -> !l.isBlank())
+                                .map(l -> {
+                                    l = l.replace('\\', '/');
+                                    return Long.toUnsignedString(HashUtils.hashIDF(l), 16) + "," + l;
+                                })
+                                .collect(Collectors.toCollection(sort.isSelected() ? TreeSet::new : ArrayList::new))
+                );
+            } else {
+                output = String.join("\n",
                         Arrays.stream(textContent.split("\n"))
                                 .filter(l -> !l.isBlank())
                                 .map(l -> {
@@ -421,36 +455,42 @@ public class HashSearcherFrame extends JFrame {
                                         return "hash_" + Long.toUnsignedString(HashUtils.hashFNV(l), 16) + "," + l;
                                     }
                                 })
-                                .parallel()
-                                .collect(Collectors.toCollection(TreeSet::new))
+                                .collect(Collectors.toCollection(sort.isSelected() ? TreeSet::new : ArrayList::new))
                 );
-                hashesConverted.setText(output);
             }
+            hashesConverted.setText(output);
+        };
 
+        hashes.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                loadText();
+                loadText.run();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                loadText();
+                loadText.run();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                loadText();
+                loadText.run();
             }
         });
 
+        idf.addActionListener(l -> loadText.run());
+        sort.addActionListener(l -> loadText.run());
+
         JButton copyFind = new JButton("Copy");
-        copyFind.setBounds(20, height - 70, width - 40, 20);
+        copyFind.setBounds(20, height - 70, width - 240, 20);
         copyFind.setBackground(Color.WHITE);
         copyFind.setForeground(Color.BLACK);
         copyFind.setBorder(new LineBorder(Color.LIGHT_GRAY));
         copyFind.addActionListener(l -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(hashesConverted.getText()), null));
 
         panel.add(scrollHashes);
+        panel.add(idf);
+        panel.add(sort);
         panel.add(scrollHashesConverted);
         panel.add(copyFind);
         return pane.getTabCount();
