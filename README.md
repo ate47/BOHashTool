@@ -58,6 +58,14 @@ It will compute the permutations of a string to find close values
 
 ![example 5](docs/example_5.png)
 
-You can hash multiple values without searching them in a repository (useful to create a dump)
+You can hash multiple values without searching them in a repository (useful to get the hashes of multiple IDs already found)
 
 ![example 6](docs/example_6.png)
+
+The hashes found, you can replace them in the GSC directory using the replace tool
+
+![example 7](docs/example_7.png)
+
+You can get all the hashes/scripts of a dataset using the extractor tool
+
+![example 8](docs/example_8.png)
