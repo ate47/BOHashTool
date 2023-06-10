@@ -1,6 +1,7 @@
 package fr.atesab.bo4hash.ui;
 
 import fr.atesab.bo4hash.DataFetcher;
+import fr.atesab.bo4hash.Lookup;
 import fr.atesab.bo4hash.Main;
 import fr.atesab.bo4hash.Searcher;
 import fr.atesab.bo4hash.utils.ExpandTool;
@@ -33,6 +34,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -57,6 +59,7 @@ public class HashSearcherFrame extends JFrame {
     public static final Image TAB_DB;
     public static final Image TAB_CONVERT;
     public static final Image TAB_INFO;
+    public static final Image TAB_LOOKUP;
     private static final String version;
     private static final Font FONT;
 
@@ -75,6 +78,7 @@ public class HashSearcherFrame extends JFrame {
             TAB_DB = atlas.getSubimage(128 + 32, 32, 32, 32);
             TAB_CONVERT = atlas.getSubimage(128 + 32 * 2, 32, 32, 32);
             TAB_INFO = atlas.getSubimage(128 + 32 * 3, 32, 32, 32);
+            TAB_LOOKUP = atlas.getSubimage(128, 32 * 2, 32, 32);
 
             version = getManifestVersion();
 
@@ -146,8 +150,8 @@ public class HashSearcherFrame extends JFrame {
         TAB_INDEX.put("replace", createTabReplace(tabbedPane, width - 20, height - 40));
         //TAB_INDEX.put("brute", createBruteTab(tabbedPane, width - 20, height - 40));
         TAB_INDEX.put("extract", createExtractTab(tabbedPane, width - 20, height - 40));
+        TAB_INDEX.put("lookup", createLookupTab(tabbedPane, width - 20, height - 40));
         TAB_INDEX.put("about", createInfoTab(tabbedPane, width - 20, height - 40));
-
 
         tabbedPane.setBackground(Color.WHITE);
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
@@ -175,8 +179,8 @@ public class HashSearcherFrame extends JFrame {
         JTextField hashObject = new JTextField();
         JLabel pathLabel = new JLabel("path: ");
         JLabel textLabel = new JLabel("unhashed: ");
-        JLabel hashStringLabel = new JLabel("hash string: ");
-        JLabel hashObjectLabel = new JLabel("hash object: ");
+        JLabel hashStringLabel = new JLabel("fnva1: ");
+        JLabel hashObjectLabel = new JLabel("canon id: ");
         JTextArea notificationField = new JTextArea();
         JButton loadPath = new JButton("Load");
         JButton copyText = new JButton("Copy");
@@ -605,6 +609,98 @@ public class HashSearcherFrame extends JFrame {
         panel.add(textLabel);
         panel.add(loadPath);
         panel.add(notificationField);
+        panel.add(copyNotification);
+
+        panel.setBackground(Color.WHITE);
+        return pane.getTabCount();
+    }
+
+    private int createLookupTab(JTabbedPane pane, int width, int height) {
+        JPanel panel = new JPanel(null);
+
+        pane.addTab("Lookup", panel);
+        pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_LOOKUP));
+        panel.setBackground(Color.WHITE);
+
+        JTextField path = new JTextField(Objects.requireNonNullElse(prop.getProperty(Main.CFG_LOOKUP_PATH), ""));
+        JTextField text = new JTextField();
+        JLabel pathLabel = new JLabel("path: ");
+        JLabel textLabel = new JLabel("hashed value: ");
+        JTextArea notificationField = new JTextArea();
+        JScrollPane scrollNotificationField = new JScrollPane(notificationField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JButton loadPath = new JButton("Load");
+        JButton copyNotification = new JButton("Copy");
+
+        path.setBounds(width / 2 - 300, 44, 580, 20);
+        text.setBounds(width / 2 - 300, 44 + 30, 580, 20);
+        scrollNotificationField.setBounds(20, 44 + 30 * 2, width - 40, height - 80 - (44 + 30 * 2));
+        copyNotification.setBounds(20, height - 70, width - 40, 20);
+
+        pathLabel.setLabelFor(path);
+        pathLabel.setHorizontalAlignment(JLabel.RIGHT);
+        pathLabel.setVerticalAlignment(JLabel.CENTER);
+
+        textLabel.setLabelFor(text);
+        textLabel.setHorizontalAlignment(JLabel.RIGHT);
+        textLabel.setVerticalAlignment(JLabel.CENTER);
+
+        notificationField.setEditable(false);
+        notificationField.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
+        notificationField.setBorder(new LineBorder(Color.LIGHT_GRAY));
+        notificationField.setBackground(Color.WHITE);
+
+        path.setBorder(new LineBorder(Color.DARK_GRAY));
+        path.setBackground(Color.WHITE);
+
+        pathLabel.setBounds(path.getX() - 100, path.getY(), 100, path.getHeight());
+        textLabel.setBounds(text.getX() - 100, text.getY(), 100, text.getHeight());
+
+        loadPath.setBounds(path.getX() + path.getWidth() + 10, path.getY(), 80, path.getHeight());
+
+        loadPath.setBackground(Color.WHITE);
+        loadPath.setForeground(Color.BLACK);
+        loadPath.setBorder(new LineBorder(Color.LIGHT_GRAY));
+
+        copyNotification.setBackground(Color.WHITE);
+        copyNotification.setForeground(Color.BLACK);
+        copyNotification.setBorder(new LineBorder(Color.LIGHT_GRAY));
+
+        loadPath.addActionListener(e -> {
+            prop.setProperty(Main.CFG_LOOKUP_PATH, path.getText());
+            notificationField.setText(Lookup.loadFile(Path.of(path.getText())));
+            Main.saveLoad(prop);
+        });
+        copyNotification.addActionListener(l -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(notificationField.getText()), null));
+
+
+        text.getDocument().addDocumentListener(new DocumentListener() {
+            private void loadText() {
+                String out = Lookup.lookup(text.getText()).collect(Collectors.joining("\n"));
+                notificationField.setText(out.isEmpty() ? "no find" : out);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                loadText();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                loadText();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                loadText();
+            }
+        });
+
+        panel.add(path);
+        panel.add(text);
+        panel.add(pathLabel);
+        panel.add(textLabel);
+        panel.add(loadPath);
+        panel.add(scrollNotificationField);
         panel.add(copyNotification);
 
         panel.setBackground(Color.WHITE);

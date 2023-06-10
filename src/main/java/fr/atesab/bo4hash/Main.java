@@ -32,6 +32,8 @@ public class Main {
 
     public static final String CFG_PATH = "cfg.path";
 
+    public static final String CFG_LOOKUP_PATH = "cfg.lookupPath";
+
     public static final String CFG_EXTRACT_PATH = "cfg.extractPath";
 
     public static void main(String[] args) {

@@ -69,3 +69,7 @@ The hashes found, you can replace them in the GSC directory using the replace to
 You can get all the hashes/scripts of a dataset using the extractor tool
 
 ![example 8](docs/example_8.png)
+
+Using the lookup tool, you can search for a particular id in a strings file 
+
+![example 8](docs/example_9.png)
