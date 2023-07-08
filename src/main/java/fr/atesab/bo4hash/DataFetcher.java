@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DataFetcher {
@@ -22,15 +23,15 @@ public class DataFetcher {
 
     public static String fetch(String location, String outputFile) {
         if (location == null || location.isEmpty()) {
-            return "empty location";
+            return I18n.get("fetcher.location.empty");
         }
         if (outputFile == null || outputFile.isEmpty()) {
-            return "empty outputFile";
+            return I18n.get("fetcher.output.empty");
         }
         String log = "";
         try {
-            System.out.println("location " + location);
-            System.out.println("outputFile " + outputFile);
+            System.out.println(I18n.get("fetcher.location") + " " + location);
+            System.out.println(I18n.get("fetcher.output") + " " + outputFile);
             Path dir = Path.of(location);
             Path outputFilePath = Path.of(outputFile);
 
@@ -119,38 +120,48 @@ public class DataFetcher {
                     writer.append(Long.toString(HashUtils.hashFNV(script), 16)).append(",").append(script).write("\n");
                 }
             }
+            try (BufferedWriter writer = Files.newBufferedWriter(outputFilePath.resolve("dict.txt"))) {
+                for (String elem : splitString(strings.stream())) {
+                    writer.append(elem).write("\n");
+                }
+            }
             long total = 0;
             try (BufferedWriter writer = Files.newBufferedWriter(outputFilePath.resolve("dataset.csv"))) {
                 long scriptCount = dumpDataset(writer, "script", scripts);
                 total += scriptCount;
-                log += "write " + scriptCount + " script(s)\n";
+                log += I18n.get("fetcher.write.script", scriptCount) + "\n";
                 long hashCount = dumpDataset(writer, "hash", strings);
                 total += hashCount;
-                log += "write " + hashCount + " hash(es)\n";
+                log += I18n.get("fetcher.write.hash", hashCount) + "\n";
                 long classCount = dumpDataset(writer, "class", classes);
                 total += classCount;
-                log += "write " + classCount + " class(es)\n";
+                log += I18n.get("fetcher.write.class", classCount) + "\n";
                 long functionCount = dumpDataset(writer, "function", functions);
                 total += functionCount;
-                log += "write " + functionCount + " function(s)\n";
+                log += I18n.get("fetcher.write.function", functionCount) + "\n";
                 long namespaceCount = dumpDataset(writer, "namespace", namespaces);
                 total += namespaceCount;
-                log += "write " + namespaceCount + " namespace(s)\n";
+                log += I18n.get("fetcher.write.namespace", namespaceCount) + "\n";
 
             }
-            log += "write " + total + " element(s)\n";
+            log += I18n.get("fetcher.write.total", total) + "\n";
         } catch (Exception e) {
             StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
             return writer.toString();
         }
-        return log + "write to " + outputFile;
+        return log + I18n.get("fetcher.write.output", outputFile);
     }
 
-    private static long dumpDataset(BufferedWriter writer, String type, Set<String> dataset) throws IOException {
+    private static long dumpDataset(BufferedWriter writer, String type, Stream<String> dataset) throws IOException {
+        return dumpDataset(writer, type, (Iterable<? extends String>) dataset::iterator);
+    }
+
+    private static long dumpDataset(BufferedWriter writer, String type, Iterable<? extends String> dataset) throws IOException {
         boolean fnv = HashUtils.isFNV(type);
         String prefix = type + "_";
         long count = 0;
+
         for (String entry : dataset) {
             if (!entry.startsWith(prefix)) {
                 if (fnv) {
@@ -163,5 +174,13 @@ public class DataFetcher {
         }
         writer.flush();
         return count;
+    }
+
+    public static Set<String> splitString(Stream<String> strings) {
+        return strings
+                .filter(s -> !(s.startsWith("hash_") || s.startsWith("script_") || s.startsWith("function_") || s.startsWith("namespace_") || s.startsWith("var_")))
+                .flatMap(s -> Stream.of(s.toLowerCase().split("[^a-z0-9]")))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toCollection(TreeSet<String>::new));
     }
 }

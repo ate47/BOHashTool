@@ -14,15 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
-
 public class Lookup {
     private record LookupElement(String id, String[] data) {
     }
 
-    private static final List<LookupElement> HASHMAP = new ArrayList<>();
+    private final List<LookupElement> HASHMAP = new ArrayList<>();
 
-    public static String loadFile(Path path) {
+    public String loadFile(Path path) {
         Map<Long, List<String>> hashmap = new HashMap<>();
         try (Stream<String> lines = Files.lines(path)) {
             lines.forEach(l -> {
@@ -37,16 +35,14 @@ public class Lookup {
             return writer.toString();
         }
         HASHMAP.clear();
-        hashmap.forEach((hash, lst) -> {
-            HASHMAP.add(new LookupElement(Long.toUnsignedString(hash, 16).toLowerCase(), lst.toArray(String[]::new)));
-        });
+        hashmap.forEach((hash, lst) -> HASHMAP.add(new LookupElement(Long.toUnsignedString(hash, 16).toLowerCase(), lst.toArray(String[]::new))));
         HASHMAP.sort(Comparator.comparing(LookupElement::id));
-        return format("Loaded %d hash(es)", HASHMAP.stream().mapToLong(l -> l.data.length).sum());
+        return I18n.get("lookup.loaded", HASHMAP.stream().mapToLong(l -> l.data.length).sum());
     }
 
-    public static Stream<String> lookup(String hash) {
+    public Stream<String> lookup(String hash) {
         if (HASHMAP.isEmpty()) {
-            return Stream.of("empty hash map, load?");
+            return Stream.of(I18n.get("lookup.empty"));
         }
         int split = hash.indexOf('_');
         int start;

@@ -1,5 +1,7 @@
 package fr.atesab.bo4hash.utils;
 
+import fr.atesab.bo4hash.I18n;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,7 +55,7 @@ public class ReplacerTool {
                                 p = newP;
                                 updated.incrementAndGet();
                             } catch (IOException e) {
-                                return "can't move " + p + " to " + newP + ": " + e.getMessage();
+                                return I18n.get("ui.replace.badmove", p, newP) + ": " + e.getMessage();
                             }
                         }
 
@@ -62,7 +64,7 @@ public class ReplacerTool {
                             s = Files.readString(p, StandardCharsets.UTF_8);
                             read.incrementAndGet();
                         } catch (IOException e) {
-                            return "can't load " + p + ": " + e.getMessage();
+                            return I18n.get("ui.replace.badload", p) + ": " + e.getMessage();
                         }
                         String ns = s;
                         // faster because it's most likely smaller as the file's hashes
@@ -74,13 +76,13 @@ public class ReplacerTool {
                                 Files.writeString(p, ns, StandardCharsets.UTF_8);
                                 updated.incrementAndGet();
                             } catch (IOException e) {
-                                return "can't write " + p + ": " + e.getMessage();
+                                return I18n.get("ui.replace.badwrite", p) + ": " + e.getMessage();
                             }
                         }
                         return null;
                     }).filter(Objects::nonNull)
                     .collect(Collectors.joining("\n"));
-            return output + (output.isEmpty() ? "" : "\n") + read.get() + " file(s) read / " + updated.get() + " file(s) updated";
+            return output + (output.isEmpty() ? "" : "\n") + I18n.get("ui.replace.output", read.get(), updated.get());
         }
     }
 

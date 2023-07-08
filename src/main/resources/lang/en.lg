@@ -1,0 +1,132 @@
+# Language file for the english language
+
+# Language data
+lang=en
+lang.author=ATE47
+lang.name=English
+# Language icon in the atlas.png file
+lang.atlas.x=0
+lang.atlas.y=128
+lang.atlas.w=16
+lang.atlas.h=16
+
+ui.language=Language
+ui.language.select=Selected language
+ui.language.selected=Selected
+ui.language.select.author=%s by %s
+ui.language.warn=The translation might not be completed
+
+loader.waiting=Waiting for GSC file
+loader.title=Loading scripts
+loader.loading=Loading
+
+ui.title=COD Hash tool (%s by %s)
+ui.path=Path
+ui.open=Open
+ui.load=Load
+ui.copy=Copy
+
+ui.file.createDir=The directory doesn't exist, do you want to create it?
+ui.file.createFile=The file doesn't exist, do you want to create it?
+ui.file.badDir=%s isn't a valid directory
+ui.file.badFile=%s isn't a valid file
+
+ui.search=Search
+ui.search.desc=@"
+The search tool allows you to search for a particular hash, it will try to search for permutation of you string.
+</p>
+<p>
+You can set a prefix using the '|' keyword, it won't do any permutation the element before it.
+If you add a second one it will act a suffix and won't do any permutation after it. If you end your hash by ".gsc"
+or by
+".csc", it will search for the hash with from the last '/' to the '.' and to the same hash with ".csc" or ".gsc" at
+the end.
+"@
+
+ui.search.unhashed=unhashed
+ui.search.fnva1=fnva1
+ui.search.canonid=canon id
+ui.search.noFind=No find
+
+ui.search.large=Large search
+ui.search.large.expand=Expand
+ui.search.large.desc=@"
+The large search tool allows you to search for multiple hashes at the same time, unlike Search, it won't do any
+permutation without the expand check.
+"@
+
+ui.hash=Large hash
+ui.hash.idf=Canon. ID
+ui.hash.sort=Sort Result
+ui.hash.desc=@"
+The large hash tool allows you to hash multiple elements at the same time with the hash methods, it won't search
+for the hash in your files.
+It can be useful to create a list of hashes from components.
+
+You can specify the algorithm using the Canon. ID checkbox to switch from the string/script hash method to the identifier hash method.
+
+You can also sort the results to remove duplicated.
+"@
+
+ui.replace=Replace
+ui.replace.replace=Replace
+ui.replace.desc=@"
+The replace tool allows you to replace all the found elements in your directory, the syntax is the same as the one
+returned by the Search tools.
+"@
+ui.replace.badmove=Can't move %s to %s
+ui.replace.badload=Can't load %s
+ui.replace.badwrite=Can't write %s
+ui.replace.output=%d file(s) read / %d file(s) updated
+
+ui.extractor=Extractor
+ui.extractor.extract=Extract
+ui.extractor.output=Output path
+ui.extractor.desc=@"
+The extractor tool allows you to extract all the elements in your directory, it will write it into an output directory.
+"@
+
+ui.lookup=Lookup
+ui.lookup.hash=hashed value
+ui.lookup.desc=@"
+The lookup tool allows you to search in a string file a particular hash, the file format is one string per line, it works on both FNVA1 and Canon id hashes.
+"@
+
+ui.brute=Brute
+
+ui.binaries=Binaries
+
+ui.dictionary=Dictionary
+
+ui.infotext=Help
+ui.infotext.baddesktop=Desktop not supported
+ui.infotext.authors=Author(s)
+ui.infotext.license=License
+ui.infotext.info=Loading status
+ui.infotext.tools=Tools
+ui.infotext.repositories=Repositories
+ui.infotext.repositories.desc=Here a small list of repositories to find some hashed .gsc scripts.
+ui.infotext.changelogs=Changelogs
+
+searcher.badDir=file doesn't exist!
+searcher.cantLoad=can't load %s
+searcher.collision=Warning collision!
+searcher.write.hash=Write hashes in %s
+searcher.write.idfs=Write identifiers in %s
+searcher.notif=loaded %d hash(es) | %d string(s), %d file(s), %d idf(s)
+
+fetcher.location=location
+fetcher.location.empty=empty location
+fetcher.output=outputFile
+fetcher.output.empty=empty output
+fetcher.write.total=Write %s element(s)
+fetcher.write.output=Write to %s
+fetcher.write.script=Write %s script(s)
+fetcher.write.hash=Write %s hash(es)
+fetcher.write.class=Write %s class(es)
+fetcher.write.function=Write %s function(s)
+fetcher.write.namespace=Write %s namespace(s)
+fetcher.write.dict=Write %s dict element(s)
+
+lookup.loaded=Loaded %d hash(es)
+lookup.empty=empty hash map, load?

@@ -1,0 +1,134 @@
+# Language file for the french language
+
+lang=fr
+lang.author=ATE47
+lang.name=Français
+# Language icon in the atlas.png file
+lang.atlas.x=16
+lang.atlas.y=128
+lang.atlas.w=16
+lang.atlas.h=16
+
+ui.language=Langue
+ui.language.select=Langue selectionné
+ui.language.selected=Selectionné
+ui.language.select.author=%s par %s
+ui.language.warn=La traduction n'est peut-être pas complète suivant la langue
+
+
+loader.waiting=En attente de script GSC
+loader.title=Chargement des scripts
+loader.loading=Chargement
+
+ui.title=COD Hash tool (%s par %s)
+ui.path=Chemin
+ui.open=Ouvrir
+ui.load=Charger
+ui.copy=Copier
+
+ui.file.createDir=Le dossier n'existe pas, voulez-vous le créer ?
+ui.file.createFile=Le fichier n'existe pas, voulez-vous le créer ?
+ui.file.badDir=%s n'est pas un dossier valide
+ui.file.badFile=%s n'est pas un fichier valide
+
+ui.search=Recherche
+ui.search.desc=@"
+The search tool allows you to search for a particular hash, it will try to search for permutation of you string.
+</p>
+<p>
+You can set a prefix using the '|' keyword, it won't do any permutation the element before it.
+If you add a second one it will act a suffix and won't do any permutation after it. If you end your hash by ".gsc"
+or by
+".csc", it will search for the hash with from the last '/' to the '.' and to the same hash with ".csc" or ".gsc" at
+the end.
+"@
+
+ui.search.unhashed=non hashé
+ui.search.fnva1=fnva1
+ui.search.canonid=canon id
+ui.search.noFind=Aucune trouvaille
+
+ui.search.large=Recherche large
+ui.search.large.expand=Etendre
+ui.search.large.desc=@"
+The large search tool allows you to search for multiple hashes at the same time, unlike Search, it won't do any
+permutation without the expand check.
+"@
+
+ui.hash=Hashage large
+ui.hash.idf=Canon. ID
+ui.hash.sort=Trier
+ui.hash.desc=@"
+The large hash tool allows you to hash multiple elements at the same time with the hash methods, it won't search
+for the hash in your files.
+It can be useful to create a list of hashes from components.
+
+You can specify the algorithm using the Canon. ID checkbox to switch from the string/script hash method to the identifier hash method.
+
+You can also sort the results to remove duplicated.
+"@
+
+ui.replace=Remplaceur
+ui.replace.replace=Remplacer
+ui.replace.desc=@"
+L'outil remplaceur vous permet de remplacer tous les elements trouvés dans votre dossier,
+la syntaxe est la même que celle retournée par les outils de recherche.
+"@
+ui.replace.badmove=Impossible de déplacer %s vers %s
+ui.replace.badload=Impossible de charger %s
+ui.replace.badwrite=Impossible de lire %s
+ui.replace.output=%d fichier(s) lu(s) / %d fichier(s) modifié(s)
+
+ui.extractor=Extracteur
+ui.extractor.extract=Extraire
+ui.extractor.output=Sortie
+ui.extractor.desc=@"
+L'outil extracteur vous permet d'extraire tous les elements de votre dossier,
+il va l'écrire dans le dossier de sortie
+"@
+
+ui.lookup=Lookup
+ui.lookup.hash=Valeur hashée
+ui.lookup.desc=@"
+L'outil lookup vous permet de chercher dans un fichier de string un hash particulier,
+le format est une string par ligne, il marche avec les hashs FNVA1 et les ID canonique
+"@
+
+ui.brute=Brute
+
+ui.binaries=Binaries
+
+ui.dictionary=Dictionnaire
+
+ui.infotext=Aide
+ui.infotext.baddesktop=Desktop not supported
+ui.infotext.authors=Auteur(s)
+ui.infotext.license=Licence
+ui.infotext.info=Status de chargement
+ui.infotext.tools=Outils
+ui.infotext.repositories=Dépôts
+ui.infotext.repositories.desc=Voici une petite liste de dépôts pour trouver des scripts gsc hashés.
+ui.infotext.changelogs=Notes des mises à jour
+
+searcher.badDir=Le fichier n'existe pas!
+searcher.cantLoad=Impossible de charger %s
+searcher.collision=Attention collision!
+searcher.write.hash=Écriture des hashs in %s
+searcher.write.idfs=Écriture des identifiants in %s
+searcher.notif=%d hash(s) chargé | %d string(s), %d fichier(s), %d idf(s)
+
+fetcher.location=position
+fetcher.location.empty=position vide
+fetcher.output=sortie
+fetcher.output.empty=sortie vide
+fetcher.write.total=Écriture de %s element(s)
+fetcher.write.output=Écriture vers %s
+fetcher.write.script=Écriture de %s script(s)
+fetcher.write.hash=Écriture de %s hash(es)
+fetcher.write.class=Écriture de %s classe(s)
+fetcher.write.function=Écriture de %s fonction(s)
+fetcher.write.namespace=Écriture de %s espace(s) de noms
+fetcher.write.dict=Écriture de %s element(s) de dictionnaire
+
+lookup.loaded=%d hash(s) chargé(s)
+lookup.empty=hashmap vide, chargée?

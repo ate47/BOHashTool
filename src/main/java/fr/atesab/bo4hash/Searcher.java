@@ -154,7 +154,7 @@ public class Searcher {
             Path dir = Path.of(dirPath);
 
             if (!Files.exists(dir)) {
-                return "file doesn't exists!";
+                return I18n.get("searcher.badDir");
             }
             idfs.clear();
             strings.clear();
@@ -162,6 +162,8 @@ public class Searcher {
 
             Pattern hashPattern = Pattern.compile("(hash|script)_([0-9a-fA-F]+)");
             Pattern compPattern = Pattern.compile("(function|namespace|var|class)_([0-9a-fA-F]+)");
+
+            String loadingI18n = I18n.get("loader.loading");
 
             AtomicInteger count = new AtomicInteger(1);
             try (Stream<Path> list = Files.walk(dir)) {
@@ -199,7 +201,7 @@ public class Searcher {
                     if (!(name.endsWith(".gsc") || name.endsWith(".csc"))) {
                         return;
                     }
-                    listener.notification("loading #" + count.getAndIncrement() + " - " + name);
+                    listener.notification(loadingI18n + " #" + count.getAndIncrement() + " - " + name);
                     if (name.startsWith("script_")) {
                         Obj obj = new Obj(name.substring("script_".length(), name.length() - 4).toLowerCase(), name.substring(0, name.length() - 4));
                         files.put(Long.parseUnsignedLong(obj.hash(), 16), obj);
@@ -208,7 +210,7 @@ public class Searcher {
                     try {
                         s = Files.readString(p, StandardCharsets.UTF_8);
                     } catch (IOException e) {
-                        throw new RuntimeException("can't load " + p + ": " + e.getMessage(), e);
+                        throw new RuntimeException(I18n.get("searcher.cantLoad", p) + ": " + e.getMessage(), e);
                     }
                     Matcher hashMatch = hashPattern.matcher(s);
                     while (hashMatch.find()) {
@@ -218,7 +220,7 @@ public class Searcher {
                         }
                         Obj old = strings.put(Long.parseUnsignedLong(obj.hash(), 16), obj);
                         if (old != null && !obj.element().equals(old.element())) {
-                            listener.notification("Warning collision! " + old.element() + "/" + obj.element());
+                            listener.notification(I18n.get("searcher.collision") + " " + old.element() + "/" + obj.element());
                         }
                     }
                     Matcher compMatch = compPattern.matcher(s);
@@ -233,7 +235,7 @@ public class Searcher {
             }
 
             Path hashes = Path.of("hashes.txt");
-            listener.notification("Write hashes in " + hashes.toAbsolutePath());
+            listener.notification(I18n.get("searcher.write.hash", hashes.toAbsolutePath()));
             try (BufferedWriter w = Files.newBufferedWriter(hashes)) {
                 for (Obj hash : strings.values()) {
                     w.append(hash.hash()).append(",").append(hash.element()).append("\n");
@@ -245,7 +247,7 @@ public class Searcher {
                 }
             }
             Path comp = Path.of("comp.txt");
-            listener.notification("Write identifiers in " + comp.toAbsolutePath());
+            listener.notification(I18n.get("searcher.write.idfs", comp.toAbsolutePath()));
             try (BufferedWriter w = Files.newBufferedWriter(comp)) {
                 for (Set<Obj> cc : idfs.values()) {
                     for (var c : cc) {
@@ -254,7 +256,8 @@ public class Searcher {
                     w.flush();
                 }
             }
-            String output = "loaded " + (strings.size() + files.size() + idfs.size()) + " hash(es) | " + strings.size() + " strings, " + files.size() + " files, " + idfs.size() + " idfs";
+            String output = I18n.get("searcher.notif",
+                    strings.size() + files.size() + idfs.size(), strings.size(), files.size(), idfs.size());
             listener.notification(output);
             return output;
         } catch (Throwable t) {
@@ -302,7 +305,7 @@ public class Searcher {
                         loc /= dict.length();
                     } while (loc > 0);
 
-                    if (id % 10_000_000 == 1) {
+                    if (id % 100_000_000 == 1) {
                         System.out.println("tried " + (id - 1) + "/" + fmaxId + " elements: " + b.reverse());
                     }
 

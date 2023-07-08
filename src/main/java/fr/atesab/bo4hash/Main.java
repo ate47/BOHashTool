@@ -35,10 +35,14 @@ public class Main {
     public static final String CFG_LOOKUP_PATH = "cfg.lookupPath";
 
     public static final String CFG_EXTRACT_PATH = "cfg.extractPath";
+    public static final String CFG_LARGE_SEARCH_PATTERN = "cfg.search.large.pattern";
+    public static final String CFG_LARGE_SEARCH_EXPAND = "cfg.search.large.expand";
+    public static final String CFG_LANGUAGE = "cfg.language";
 
     public static void main(String[] args) {
         Properties prop = readLastLoad();
         try {
+            I18n.loadLang(prop.getProperty(Main.CFG_LANGUAGE));
             LoadingFrame.ResultSearcher searcher = LoadingFrame.loadSearcher(prop);
             new HashSearcherFrame(prop, searcher.searcher(), searcher.text());
         } catch (Throwable t) {
@@ -47,5 +51,7 @@ public class Main {
             new HashSearcherFrame(new Properties(), new Searcher(), writer.toString());
         }
     }
+
+
 }
 // bf29ce484222325

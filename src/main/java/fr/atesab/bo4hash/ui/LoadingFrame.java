@@ -1,5 +1,6 @@
 package fr.atesab.bo4hash.ui;
 
+import fr.atesab.bo4hash.I18n;
 import fr.atesab.bo4hash.Main;
 import fr.atesab.bo4hash.Searcher;
 
@@ -22,7 +23,7 @@ public class LoadingFrame extends JFrame implements Searcher.IndexListener {
             loading.setVisible(false);
             loading.dispose();
         } else {
-            result = "Waiting for GSC files";
+            result = I18n.get("loader.waiting");
         }
         return new ResultSearcher(searcher, result);
     }
@@ -30,7 +31,7 @@ public class LoadingFrame extends JFrame implements Searcher.IndexListener {
     private final JTextField area;
 
     public LoadingFrame() {
-        super("Loading scripts");
+        super(I18n.get("loader.title"));
         setIconImage(HashSearcherFrame.ICON);
         JPanel panel = new JPanel(null);
 

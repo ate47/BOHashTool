@@ -1,5 +1,10 @@
 package fr.atesab.bo4hash.ui;
 
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.data.MutableDataSet;
+import fr.atesab.bo4hash.I18n;
+
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -21,15 +26,42 @@ import java.util.stream.Collectors;
 
 public class InfoTabInfo {
     private static final String TEXT;
+    private static final String CHANGELOGS;
 
     static {
         try {
-            try (InputStream is = InfoTabInfo.class.getClassLoader().getResourceAsStream("infoText.html")) {
+            MutableDataSet options = new MutableDataSet();
+            Parser parser = Parser.builder(options).build();
+            HtmlRenderer renderer = HtmlRenderer.builder().build();
+
+            String textBody;
+
+            try (InputStream is = InfoTabInfo.class.getClassLoader().getResourceAsStream("infoTextBody.html")) {
                 if (is == null) {
                     throw new Error("Can't read info text!");
                 }
 
-                TEXT = new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n"));
+                textBody = new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n"));
+            }
+
+            try (InputStream is = InfoTabInfo.class.getClassLoader().getResourceAsStream("infoText.md")) {
+                if (is == null) {
+                    throw new Error("Can't read info text!");
+                }
+
+                String infoText = new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n"));
+
+
+                TEXT = textBody.replace("{{INFO_TEXT_PAGE}}", renderer.render(parser.parse(infoText)));
+            }
+            try (InputStream is = InfoTabInfo.class.getClassLoader().getResourceAsStream("changelogs.md")) {
+                if (is == null) {
+                    throw new Error("Can't read changelogs text!");
+                }
+
+                String changelogsText = new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n"));
+
+                CHANGELOGS = renderer.render(parser.parse(changelogsText));
             }
         } catch (Exception t) {
             throw new Error(t);
@@ -68,6 +100,7 @@ public class InfoTabInfo {
         dataMap.put("project.url", projectURL);
         dataMap.put("authors", Arrays.stream(authors).map(s -> "<a href=\"%s\">%s</a>".formatted(s[1], s[0])).collect(Collectors.joining(", ")));
         dataMap.put("license", license);
+        dataMap.put("changelogs", CHANGELOGS);
 
         updateText();
     }
@@ -86,7 +119,7 @@ public class InfoTabInfo {
         String output = "";
         try {
             if (!Desktop.isDesktopSupported()) {
-                output = "Desktop not supported";
+                output = I18n.get("ui.infotext.baddesktop");
                 return;
             }
             Desktop.getDesktop().browse(url.toURI());
@@ -102,7 +135,7 @@ public class InfoTabInfo {
         }
     }
 
-    private static final Pattern HTML_VAR_MATCHER = Pattern.compile("\\{\\{([a-zA-Z_\\-.\\d]+)}}");
+    private static final Pattern HTML_VAR_MATCHER = Pattern.compile("\\{\\{(([a-zA-Z_\\-.\\d]+)|(#[a-zA-Z_\\-.\\d]+))}}");
 
     private String applyVar(String text, Map<String, String> vars) {
         StringBuilder buffer = new StringBuilder();
@@ -116,13 +149,21 @@ public class InfoTabInfo {
                 buffer.append(text, end, mStart);
             }
 
-            String value = vars.get(key);
+            String value;
+            if (key.charAt(0) == '#') {
+                // translation key
+                value = I18n.getOrNull(key.substring(1));
+            } else {
+                value = vars.get(key);
+            }
+
             if (value != null) {
                 buffer.append(value);
                 end = mEnd;
             } else {
                 end = mStart;
             }
+
         }
         if (text.length() != end) {
             buffer.append(text, end, text.length());
