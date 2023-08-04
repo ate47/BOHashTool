@@ -3,7 +3,7 @@ package fr.atesab.bo4hash.utils;
 import java.util.Set;
 
 public class HashUtils {
-    private static final Set<String> IDF_TYPES = Set.of("var", "function", "class", "namespace");
+    private static final Set<String> IDF_TYPES = Set.of("var", "function", "class", "namespace", "event");
     private static final Set<String> FNV_TYPES = Set.of("script", "hash");
 
     private static final long SCRIPT_NAMESPACE = 0x30FCC2BF;
@@ -33,7 +33,7 @@ public class HashUtils {
     public static long hashFNV(String input) {
         long num = NUM_START;
         for (int index = 0; index < input.length(); ++index) {
-            num ^= input.charAt(index);
+            num ^= Character.toLowerCase(input.charAt(index));
             num *= 0x100000001b3L;
         }
         return num & 0x7FFFFFFF_FFFFFFFFL;

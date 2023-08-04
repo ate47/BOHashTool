@@ -161,7 +161,7 @@ public class Searcher {
             files.clear();
 
             Pattern hashPattern = Pattern.compile("(hash|script)_([0-9a-fA-F]+)");
-            Pattern compPattern = Pattern.compile("(function|namespace|var|class)_([0-9a-fA-F]+)");
+            Pattern compPattern = Pattern.compile("(function|namespace|var|class|event)_([0-9a-fA-F]+)");
 
             String loadingI18n = I18n.get("loader.loading");
 
@@ -198,7 +198,7 @@ public class Searcher {
                         return;
                     }
 
-                    if (!(name.endsWith(".gsc") || name.endsWith(".csc"))) {
+                    if (!(name.endsWith(".gsc") || name.endsWith(".csc") || name.endsWith(".gcsc") || name.endsWith(".csv"))) {
                         return;
                     }
                     listener.notification(loadingI18n + " #" + count.getAndIncrement() + " - " + name);

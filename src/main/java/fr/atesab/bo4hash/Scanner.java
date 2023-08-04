@@ -134,15 +134,9 @@ public class Scanner {
 
         String[][] sets = {
                 {"", ""},
-                {"specialty_", ""},
-                {"specialty_mod_", ""},
-                {"specialty_detect", ""},
-                {"specialty_immune", ""},
-                {"specialty_showenemy", ""},
-                {"specialty_sprint", ""},
-                {"specialty_health", ""},
-                {"specialty_fast", ""},
-
+                {"status_effect_", ""},
+                {"status_effect_", "_movement"},
+                {"status_effect_movement_", ""}
         };
 
         //final char[] mid = {'_', '/', ' '};
