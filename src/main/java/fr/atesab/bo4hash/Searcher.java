@@ -198,12 +198,13 @@ public class Searcher {
                         return;
                     }
 
-                    if (!(name.endsWith(".gsc") || name.endsWith(".csc") || name.endsWith(".gcsc") || name.endsWith(".csv"))) {
+                    if (!(HashUtils.isHashFile(name))) {
                         return;
                     }
                     listener.notification(loadingI18n + " #" + count.getAndIncrement() + " - " + name);
                     if (name.startsWith("script_")) {
-                        Obj obj = new Obj(name.substring("script_".length(), name.length() - 4).toLowerCase(), name.substring(0, name.length() - 4));
+                        int endIx = Math.max(0, name.lastIndexOf('.'));
+                        Obj obj = new Obj(name.substring("script_".length(), endIx).toLowerCase(), name.substring(0, endIx));
                         files.put(Long.parseUnsignedLong(obj.hash(), 16), obj);
                     }
                     String s;

@@ -1,5 +1,7 @@
 package fr.atesab.bo4hash;
 
+import fr.atesab.bo4hash.utils.HashUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +31,8 @@ public class MainReader {
                 "namespace_",
                 "var_",
                 "hash_",
-                "script_"
+                "script_",
+                "event_"
         };
 
         Path dir = Path.of(prop.getProperty(Main.CFG_PATH));
@@ -41,7 +44,7 @@ public class MainReader {
                 }
                 String name = dir.relativize(p).getFileName().toString();
                 System.out.println("loading " + name);
-                if (!(name.endsWith(".gsc") || name.endsWith(".csc"))) {
+                if (!(HashUtils.isHashFile(name))) {
                     return;
                 }
                 String s;

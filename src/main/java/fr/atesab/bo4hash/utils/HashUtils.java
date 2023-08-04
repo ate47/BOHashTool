@@ -1,5 +1,6 @@
 package fr.atesab.bo4hash.utils;
 
+import java.nio.file.Path;
 import java.util.Set;
 
 public class HashUtils {
@@ -15,6 +16,10 @@ public class HashUtils {
 
     public static boolean isFNV(String type) {
         return FNV_TYPES.contains(type);
+    }
+
+    public static boolean isHashFile(String name) {
+        return name.endsWith(".gsc") || name.endsWith(".csc") || name.endsWith(".gcsc") || name.endsWith(".csv");
     }
 
     public static long hashIDF(String input) {

@@ -48,12 +48,12 @@ public class DataFetcher {
                     }
                     Path rp = dir.relativize(p);
                     String name = rp.getFileName().toString();
-                    if (!(name.endsWith(".gsc") || name.endsWith(".csc"))) {
+                    if (!(HashUtils.isHashFile(name))) {
                         return;
                     }
 
 
-                    if (name.startsWith("script_")) {
+                    if (name.startsWith("script_") && (name.endsWith(".gsc") || name.endsWith(".csc"))) {
                         scripts.add(name.substring(0, name.length() - ".gsc".length()));
                     } else {
                         scripts.add(rp.toString().replace('\\', '/'));
@@ -126,7 +126,7 @@ public class DataFetcher {
                 }
             }
             long total = 0;
-            try (BufferedWriter writer = Files.newBufferedWriter(outputFilePath.resolve("dataset.csv"))) {
+            try (BufferedWriter writer = Files.newBufferedWriter(outputFilePath.resolve("dataset.txt"))) {
                 long scriptCount = dumpDataset(writer, "script", scripts);
                 total += scriptCount;
                 log += I18n.get("fetcher.write.script", scriptCount) + "\n";
@@ -178,7 +178,7 @@ public class DataFetcher {
 
     public static Set<String> splitString(Stream<String> strings) {
         return strings
-                .filter(s -> !(s.startsWith("hash_") || s.startsWith("script_") || s.startsWith("function_") || s.startsWith("namespace_") || s.startsWith("var_")))
+                .filter(s -> !(s.startsWith("hash_") || s.startsWith("script_") || s.startsWith("event_") || s.startsWith("function_") || s.startsWith("namespace_") || s.startsWith("var_")))
                 .flatMap(s -> Stream.of(s.toLowerCase().split("[^a-z0-9]")))
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.toCollection(TreeSet<String>::new));

@@ -43,7 +43,7 @@ public class ReplacerTool {
                         }
                         String name = dir.relativize(p).getFileName().toString();
                         // ignore non GSC file
-                        if (!(name.endsWith(".gsc") || name.endsWith(".csc"))) {
+                        if (!(HashUtils.isHashFile(name))) {
                             return null;
                         }
                         String fileReplacement = hashIndex.get(name.substring(0, name.length() - 4));
