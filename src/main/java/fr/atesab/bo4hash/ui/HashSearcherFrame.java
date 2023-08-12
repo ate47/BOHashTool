@@ -286,10 +286,24 @@ public class HashSearcherFrame extends JFrame {
         text.getDocument().addDocumentListener(new DocumentListener() {
             private void loadText() {
                 String textContent = text.getText();
-                String hashStringValue = Long.toUnsignedString(HashUtils.hashFNV(textContent), 16).toLowerCase();
-                String hashObjectValue = Long.toUnsignedString(HashUtils.hashIDF(textContent), 16).toLowerCase();
-                hashString.setText(hashStringValue);
-                hashObject.setText(hashObjectValue);
+                String hashStringValue = null;
+                String hashObjectValue = null;
+                int splitIdx;
+                if (textContent.startsWith("#hash_") && (splitIdx = textContent.indexOf('+')) != -1) {
+                    String val = textContent.substring("#hash_".length(), splitIdx);
+                    String next = textContent.substring(splitIdx + 1);
+                    try {
+                        hashStringValue = Long.toUnsignedString(HashUtils.hashFNV(Long.parseUnsignedLong(val, 16), next), 16);
+                        hashObjectValue = "n/a";
+                    } catch (RuntimeException e) {
+                        hashStringValue = "error: " + e.getMessage();
+                        hashObjectValue = "";
+                    }
+                }
+
+                hashString.setText(Objects.requireNonNullElseGet(hashStringValue, () -> Long.toUnsignedString(HashUtils.hashFNV(textContent), 16).toLowerCase()));
+                hashObject.setText(Objects.requireNonNullElseGet(hashObjectValue, () -> Long.toUnsignedString(HashUtils.hashIDF(textContent), 16).toLowerCase()));
+
                 String output = String.join("\n", ExpandTool
                         .expand(textContent)
                         .flatMap(k -> HashSearcherFrame.this.searcher.search(k).stream().map(o -> o.element() + "," + k))

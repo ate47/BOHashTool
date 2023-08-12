@@ -36,7 +36,9 @@ public class HashUtils {
     }
 
     public static long hashFNV(String input) {
-        long num = NUM_START;
+        return hashFNV(NUM_START, input);
+    }
+    public static long hashFNV(long num, String input) {
         for (int index = 0; index < input.length(); ++index) {
             num ^= Character.toLowerCase(input.charAt(index));
             num *= 0x100000001b3L;
