@@ -70,6 +70,10 @@ You can get all the hashes/scripts of a dataset using the extractor tool
 
 ![example 8](docs/example_8.png)
 
-Using the lookup tool, you can search for a particular id in a strings file 
+Using the lookup tool, you can search for a particular id in a strings file
 
-![example 8](docs/example_9.png)
+![example 9](docs/example_9.png)
+
+A version is of lookup tool is available for large search (can be long for large queries)
+
+![example 10](docs/example_10.png)
