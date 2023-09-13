@@ -87,6 +87,7 @@ The extractor tool allows you to extract all the elements in your directory, it 
 "@
 
 ui.lookup=Lookup
+ui.lookup.large=Lookup (Large)
 ui.lookup.hash=hashed value
 ui.lookup.desc=@"
 The lookup tool allows you to search in a string file a particular hash, the file format is one string per line, it works on both FNVA1 and Canon id hashes.

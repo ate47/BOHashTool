@@ -125,8 +125,10 @@ public class Scanner {
 
     public static void poly(String[] args) throws IOException, InterruptedException {
         Properties prop = Main.readLastLoad();
-        String pathCfg = prop.getProperty(Main.CFG_PATH);
-        Path dict = Path.of("N:/bo4hash/words.txt");
+        //String pathCfg = prop.getProperty(Main.CFG_PATH);
+        String pathCfg = "N:\\bo4hash\\t8wip\\gsc\\output_hash";
+        // N:\bo4hash\BO4HashForce\dictionary.txt
+        Path dict = Path.of("N:\\bo4hash\\BO4HashForce\\dictionary.txt");
         //Path dict = Path.of("dictionarybig.txt");
         Searcher searcher = new Searcher();
         System.out.println(pathCfg);
@@ -134,9 +136,6 @@ public class Scanner {
 
         String[][] sets = {
                 {"", ""},
-                {"status_effect_", ""},
-                {"status_effect_", "_movement"},
-                {"status_effect_movement_", ""}
         };
 
         //final char[] mid = {'_', '/', ' '};

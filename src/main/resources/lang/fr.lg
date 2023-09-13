@@ -88,6 +88,7 @@ il va l'écrire dans le dossier de sortie
 "@
 
 ui.lookup=Lookup
+ui.lookup.large=Lookup (Large)
 ui.lookup.hash=Valeur hashée
 ui.lookup.desc=@"
 L'outil lookup vous permet de chercher dans un fichier de string un hash particulier,

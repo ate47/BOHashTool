@@ -40,8 +40,12 @@ public class Lookup {
         return I18n.get("lookup.loaded", HASHMAP.stream().mapToLong(l -> l.data.length).sum());
     }
 
+    public boolean empty() {
+        return HASHMAP.isEmpty();
+    }
+
     public Stream<String> lookup(String hash) {
-        if (HASHMAP.isEmpty()) {
+        if (empty()) {
             return Stream.of(I18n.get("lookup.empty"));
         }
         int split = hash.indexOf('_');

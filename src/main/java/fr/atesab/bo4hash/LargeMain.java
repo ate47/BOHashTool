@@ -16,7 +16,8 @@ public class LargeMain {
     public static void main(String[] args) throws IOException, InterruptedException {
         Properties prop = Main.readLastLoad();
         Searcher searcher = new Searcher();
-        String pathCfg = prop.getProperty(Main.CFG_PATH);
+        //String pathCfg = prop.getProperty(Main.CFG_PATH);
+        String pathCfg = "N:\\bo4hash\\t8wip\\gsc\\output_hash";
         System.out.println(pathCfg);
         System.out.println(searcher.load(pathCfg));
         // 1570000001

@@ -143,6 +143,8 @@ public class HashSearcherFrame extends JFrame {
     private final InfoTabInfo tabInfo = new InfoTabInfo(this);
     private final Map<String, Integer> TAB_INDEX = new HashMap<>();
 
+    private final Lookup lookup = new Lookup();
+
     public HashSearcherFrame(Properties prop, Searcher searcher, String startText) {
         super("CODTOOL");
         this.searcher = searcher;
@@ -162,6 +164,7 @@ public class HashSearcherFrame extends JFrame {
         TAB_INDEX.put("replace", createTabReplace(tabbedPane, width - 20, height));
         TAB_INDEX.put("large-hash", createLargeHashTab(tabbedPane, width - 20, height));
         TAB_INDEX.put("lookup", createLookupTab(tabbedPane, width - 20, height));
+        TAB_INDEX.put("lookup-large", createLookupLargeTab(tabbedPane, width - 20, height));
         //TAB_INDEX.put("brute", createBruteTab(tabbedPane, width - 20, height));
         //TAB_INDEX.put("binary", createBinaryTab(tabbedPane, width - 20, height));
         TAB_INDEX.put("extract", createExtractTab(tabbedPane, width - 20, height));
@@ -886,8 +889,6 @@ public class HashSearcherFrame extends JFrame {
         copyNotification.setForeground(Color.BLACK);
         copyNotification.setBorder(new LineBorder(Color.LIGHT_GRAY));
 
-        Lookup lookup = new Lookup();
-
         openFilePath.addActionListener(e -> {
             setVisible(false);
             try {
@@ -969,6 +970,155 @@ public class HashSearcherFrame extends JFrame {
         panel.add(textLabel);
         panel.add(openFilePath);
         panel.add(loadPath);
+        panel.add(scrollNotificationField);
+        panel.add(copyNotification);
+
+        panel.setBackground(Color.WHITE);
+        return pane.getTabCount();
+    }
+
+    private int createLookupLargeTab(JTabbedPane pane, int width, int height) {
+        JPanel panel = new JPanel(null);
+
+        pane.addTab(I18n.get("ui.lookup.large"), panel);
+        pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_LOOKUP));
+        panel.setBackground(Color.WHITE);
+
+        JTextField path = new JTextField(Objects.requireNonNullElse(prop.getProperty(Main.CFG_LOOKUP_PATH), ""));
+        JLabel pathLabel = new JLabel(I18n.get("ui.path") + ": ");
+        JTextArea notificationField = new JTextArea();
+        JTextArea lookupField = new JTextArea();
+        JScrollPane scrollLookupField = new JScrollPane(lookupField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JScrollPane scrollNotificationField = new JScrollPane(notificationField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        JButton openFilePath = new JButton(I18n.get("ui.open") + "...");
+        JButton loadPath = new JButton(I18n.get("ui.load"));
+        JButton copyNotification = new JButton(I18n.get("ui.copy"));
+
+        path.setBounds(width / 2 - 300, 44, 490, 20);
+        int nodeSize = (height - 80 - (44 + 20 + 20)) / 2;
+        scrollLookupField.setBounds(20, 44 + 30, width - 40, nodeSize);
+        scrollNotificationField.setBounds(20, 44 + 30 + nodeSize + 10, width - 40, nodeSize);
+        copyNotification.setBounds(20, height - 70, width - 40, 20);
+
+        pathLabel.setLabelFor(path);
+        pathLabel.setHorizontalAlignment(JLabel.RIGHT);
+        pathLabel.setVerticalAlignment(JLabel.CENTER);
+
+        notificationField.setEditable(false);
+        notificationField.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
+        notificationField.setBorder(new LineBorder(Color.LIGHT_GRAY));
+        notificationField.setBackground(Color.WHITE);
+
+        lookupField.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
+        lookupField.setBorder(new LineBorder(Color.LIGHT_GRAY));
+        lookupField.setBackground(Color.WHITE);
+
+        path.setBorder(new LineBorder(Color.DARK_GRAY));
+        path.setBackground(Color.WHITE);
+
+        pathLabel.setBounds(path.getX() - 100, path.getY(), 100, path.getHeight());
+
+        openFilePath.setBounds(path.getX() + path.getWidth() + 10, path.getY(), 80, path.getHeight());
+        loadPath.setBounds(path.getX() + path.getWidth() + 10 + openFilePath.getWidth() + 10, path.getY(), 80, path.getHeight());
+
+        openFilePath.setBackground(Color.WHITE);
+        openFilePath.setForeground(Color.BLACK);
+        openFilePath.setBorder(new LineBorder(Color.LIGHT_GRAY));
+
+        loadPath.setBackground(Color.WHITE);
+        loadPath.setForeground(Color.BLACK);
+        loadPath.setBorder(new LineBorder(Color.LIGHT_GRAY));
+
+        copyNotification.setBackground(Color.WHITE);
+        copyNotification.setForeground(Color.BLACK);
+        copyNotification.setBorder(new LineBorder(Color.LIGHT_GRAY));
+
+        openFilePath.addActionListener(e -> {
+            setVisible(false);
+            try {
+                JFileChooser fs = new JFileChooser();
+                String pathText = path.getText();
+                if (!pathText.isEmpty()) {
+                    fs.setCurrentDirectory(new File(pathText));
+                }
+                fs.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                int res = fs.showOpenDialog(null);
+                if (res != JFileChooser.APPROVE_OPTION) {
+                    setVisible(true);
+                    return;
+                }
+
+                Path gscDir = fs.getSelectedFile().toPath();
+                if (!Files.exists(gscDir)) {
+                    int out = JOptionPane.showConfirmDialog(null, I18n.get("ui.file.createFile"));
+
+                    if (out == JOptionPane.YES_OPTION) {
+                        Files.createFile(gscDir);
+                    } else {
+                        setVisible(true);
+                        return;
+                    }
+                } else if (!Files.isRegularFile(gscDir)) {
+                    notificationField.setText(I18n.get("ui.file.badFile", gscDir));
+                    setVisible(true);
+                    return;
+                }
+
+                path.setText(gscDir.toAbsolutePath().toString());
+
+                prop.setProperty(Main.CFG_LOOKUP_PATH, path.getText());
+                notificationField.setText(lookup.loadFile(Path.of(path.getText())));
+                Main.saveLoad(prop);
+                setVisible(true);
+            } catch (Exception err) {
+                StringWriter w = new StringWriter();
+                err.printStackTrace(new PrintWriter(w));
+                notificationField.setText(w.toString());
+                setVisible(true);
+            }
+        });
+
+        loadPath.addActionListener(e -> {
+            prop.setProperty(Main.CFG_LOOKUP_PATH, path.getText());
+            notificationField.setText(lookup.loadFile(Path.of(path.getText())));
+            Main.saveLoad(prop);
+        });
+        copyNotification.addActionListener(l -> Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(notificationField.getText()), null));
+
+
+        lookupField.getDocument().addDocumentListener(new DocumentListener() {
+            private void loadText() {
+                if (lookup.empty()) {
+                    notificationField.setText(I18n.get("lookup.empty"));
+                    return;
+                }
+                String out = Arrays.stream(lookupField.getText().split("[\n\r]+"))
+                        .flatMap(s -> lookup.lookup(s).limit(1))
+                        .collect(Collectors.joining("\n"));
+                notificationField.setText(out.isEmpty() ? I18n.get("ui.search.nofind") : out);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                loadText();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                loadText();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                loadText();
+            }
+        });
+
+        panel.add(path);
+        panel.add(pathLabel);
+        panel.add(openFilePath);
+        panel.add(loadPath);
+        panel.add(scrollLookupField);
         panel.add(scrollNotificationField);
         panel.add(copyNotification);
 
