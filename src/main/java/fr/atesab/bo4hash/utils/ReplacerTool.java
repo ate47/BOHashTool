@@ -64,7 +64,8 @@ public class ReplacerTool {
                             s = Files.readString(p, StandardCharsets.UTF_8);
                             read.incrementAndGet();
                         } catch (IOException e) {
-                            return I18n.get("ui.replace.badload", p) + ": " + e.getMessage();
+                            return null;
+                            //return I18n.get("ui.replace.badload", p) + ": " + e.getMessage();
                         }
                         String ns = s;
                         // faster because it's most likely smaller as the file's hashes

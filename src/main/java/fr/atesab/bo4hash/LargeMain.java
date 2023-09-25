@@ -17,7 +17,8 @@ public class LargeMain {
         Properties prop = Main.readLastLoad();
         Searcher searcher = new Searcher();
         //String pathCfg = prop.getProperty(Main.CFG_PATH);
-        String pathCfg = "N:\\bo4hash\\t8wip\\gsc\\output_hash";
+        //String pathCfg = "N:\\bo4hash\\t8wip\\gsc\\output_hash";
+        String pathCfg = "N:\\bo4hash\\t8wip\\bo4-source\\";
         System.out.println(pathCfg);
         System.out.println(searcher.load(pathCfg));
         // 1570000001
@@ -34,11 +35,8 @@ public class LargeMain {
             // scripts/??/mp/??.gsc 255440000000
             String[][] prefixes = {
                     {"", ""},
-                    {"specialty_", ""},
-                    {"specialty_mod_", ""},
-                    {"specialty_immune", ""},
-                    {"specialty_showenemy", ""},
-                    {"specialty_detect", ""},
+                    {"mc/mtl_attach_t8_optic_reflex_reticle_0", ""},
+                    {"mc/mtl_attach_t8_optic_reflex_reticle_", ""},
 
             };
 

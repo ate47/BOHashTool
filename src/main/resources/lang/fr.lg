@@ -99,6 +99,10 @@ ui.brute=Brute
 
 ui.binaries=Binaries
 
+ui.errordec=Error coder
+ui.errordec.decode=Decoder
+ui.errordec.encode=Encoder
+
 ui.dictionary=Dictionnaire
 
 ui.infotext=Aide

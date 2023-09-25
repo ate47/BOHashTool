@@ -206,12 +206,17 @@ public class Searcher {
                         int endIx = Math.max(0, name.lastIndexOf('.'));
                         Obj obj = new Obj(name.substring("script_".length(), endIx).toLowerCase(), name.substring(0, endIx));
                         files.put(Long.parseUnsignedLong(obj.hash(), 16), obj);
+                    } else if (name.startsWith("file_")) {
+                        int endIx = Math.max(0, name.lastIndexOf('.'));
+                        Obj obj = new Obj(name.substring("file_".length(), endIx).toLowerCase(), name.substring(0, endIx));
+                        files.put(Long.parseUnsignedLong(obj.hash(), 16), obj);
                     }
                     String s;
                     try {
                         s = Files.readString(p, StandardCharsets.UTF_8);
                     } catch (IOException e) {
-                        throw new RuntimeException(I18n.get("searcher.cantLoad", p) + ": " + e.getMessage(), e);
+                        s = ""; // bad read?
+                        //throw new RuntimeException(I18n.get("searcher.cantLoad", p) + ": " + e.getMessage(), e);
                     }
                     Matcher hashMatch = hashPattern.matcher(s);
                     while (hashMatch.find()) {

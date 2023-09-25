@@ -6,6 +6,7 @@ import fr.atesab.bo4hash.LargeSearchTool;
 import fr.atesab.bo4hash.Lookup;
 import fr.atesab.bo4hash.Main;
 import fr.atesab.bo4hash.Searcher;
+import fr.atesab.bo4hash.utils.ErrorEnDecoder;
 import fr.atesab.bo4hash.utils.ExpandTool;
 import fr.atesab.bo4hash.utils.HashUtils;
 import fr.atesab.bo4hash.utils.ReplacerTool;
@@ -67,7 +68,7 @@ public class HashSearcherFrame extends JFrame {
     public static final Image TAB_INFO;
     public static final Image TAB_LOOKUP;
     public static final Image TAB_BINARY;
-    public static final Image TAB_DICT;
+    public static final Image TAB_ERROR_CODES;
     private static final String version;
     private static final Font FONT;
 
@@ -88,7 +89,7 @@ public class HashSearcherFrame extends JFrame {
             TAB_INFO = ATLAS.getSubimage(128 + 32 * 3, 32, 32, 32);
             TAB_LOOKUP = ATLAS.getSubimage(128, 32 * 2, 32, 32);
             TAB_BINARY = ATLAS.getSubimage(128 + 32, 32 * 2, 32, 32);
-            TAB_DICT = ATLAS.getSubimage(128 + 32 * 2, 32 * 2, 32, 32);
+            TAB_ERROR_CODES = ATLAS.getSubimage(128 + 32 * 2, 32 * 2, 32, 32);
 
             version = getManifestVersion();
 
@@ -168,6 +169,7 @@ public class HashSearcherFrame extends JFrame {
         //TAB_INDEX.put("brute", createBruteTab(tabbedPane, width - 20, height));
         //TAB_INDEX.put("binary", createBinaryTab(tabbedPane, width - 20, height));
         TAB_INDEX.put("extract", createExtractTab(tabbedPane, width - 20, height));
+        TAB_INDEX.put("error_coder", createErrorCoderTab(tabbedPane, width - 20, height));
         TAB_INDEX.put("lang", createLangTab(tabbedPane, width - 20, height));
         TAB_INDEX.put("about", createInfoTab(tabbedPane, width - 20, height));
 
@@ -652,13 +654,101 @@ public class HashSearcherFrame extends JFrame {
         return pane.getTabCount();
     }
 
-    private int createDictTab(JTabbedPane pane, int width, int height) {
+    private int createErrorCoderTab(JTabbedPane pane, int width, int height) {
         JPanel panel = new JPanel(null);
 
-        pane.addTab(I18n.get("ui.dictionary"), panel);
-        pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_DICT));
+        pane.addTab(I18n.get("ui.errordec"), panel);
+        pane.setIconAt(pane.getTabCount() - 1, new ImageIcon(TAB_ERROR_CODES));
         panel.setBackground(Color.WHITE);
 
+        JTextField codedValue = new JTextField();
+        JTextField codedValueOutput = new JTextField();
+        JTextField decodedValue = new JTextField();
+        JTextField decodedValueOutput = new JTextField();
+
+        codedValueOutput.setBorder(new LineBorder(Color.DARK_GRAY));
+        codedValueOutput.setBackground(Color.WHITE);
+        codedValueOutput.setEditable(false);
+
+        decodedValueOutput.setBorder(new LineBorder(Color.DARK_GRAY));
+        decodedValueOutput.setBackground(Color.WHITE);
+        decodedValueOutput.setEditable(false);
+
+        JLabel codedValueLabel = new JLabel(I18n.get("ui.errordec.decode") + ": ");
+        JLabel decodedValueLabel = new JLabel(I18n.get("ui.errordec.encode") + ": ");
+
+        codedValue.setBounds(width / 2 - 300, 44, 250, 20);
+        codedValueOutput.setBounds(width / 2 - 40, 44, 340, 20);
+        decodedValue.setBounds(width / 2 - 300, 44 + 30, 250, 20);
+        decodedValueOutput.setBounds(width / 2 - 40, 44 + 30, 340, 20);
+
+        codedValueLabel.setLabelFor(codedValue);
+        codedValueLabel.setHorizontalAlignment(JLabel.RIGHT);
+        codedValueLabel.setVerticalAlignment(JLabel.CENTER);
+
+        decodedValueLabel.setLabelFor(decodedValue);
+        decodedValueLabel.setHorizontalAlignment(JLabel.RIGHT);
+        decodedValueLabel.setVerticalAlignment(JLabel.CENTER);
+
+        codedValueLabel.setBounds(codedValue.getX() - 100, codedValue.getY(), 100, codedValue.getHeight());
+        decodedValueLabel.setBounds(decodedValue.getX() - 100, decodedValue.getY(), 100, decodedValue.getHeight());
+
+        Runnable updateCoded = () -> {
+            try {
+                codedValueOutput.setText(Long.toString(ErrorEnDecoder.decode(codedValue.getText()), 10));
+            } catch (Exception err) {
+                codedValueOutput.setText(err.getMessage());
+            }
+        };
+        Runnable updateDecoded = () -> {
+            try {
+                decodedValueOutput.setText(String.valueOf(ErrorEnDecoder.encode(Long.parseLong(decodedValue.getText()))));
+            } catch (NumberFormatException err) {
+                decodedValueOutput.setText("");
+            } catch (Exception err) {
+                decodedValueOutput.setText(err.getMessage());
+            }
+        };
+
+        codedValue.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateCoded.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateCoded.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateCoded.run();
+            }
+        });
+        decodedValue.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateDecoded.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateDecoded.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateDecoded.run();
+            }
+        });
+
+        panel.add(codedValue);
+        panel.add(decodedValue);
+        panel.add(codedValueOutput);
+        panel.add(decodedValueOutput);
+        panel.add(codedValueLabel);
+        panel.add(decodedValueLabel);
         return pane.getTabCount();
     }
 

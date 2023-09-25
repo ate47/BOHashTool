@@ -126,7 +126,8 @@ public class Scanner {
     public static void poly(String[] args) throws IOException, InterruptedException {
         Properties prop = Main.readLastLoad();
         //String pathCfg = prop.getProperty(Main.CFG_PATH);
-        String pathCfg = "N:\\bo4hash\\t8wip\\gsc\\output_hash";
+        //String pathCfg = "N:\\bo4hash\\t8wip\\gsc\\output_hash";
+        String pathCfg = "N:\\bo4hash\\t8wip\\bo4-source\\";
         // N:\bo4hash\BO4HashForce\dictionary.txt
         Path dict = Path.of("N:\\bo4hash\\BO4HashForce\\dictionary.txt");
         //Path dict = Path.of("dictionarybig.txt");
@@ -136,6 +137,9 @@ public class Scanner {
 
         String[][] sets = {
                 {"", ""},
+                {"gamedata/events/", ".csv"},
+                {"gamedata/", ".csv"},
+                {"gamedata/loot", ".csv"},
         };
 
         //final char[] mid = {'_', '/', ' '};
